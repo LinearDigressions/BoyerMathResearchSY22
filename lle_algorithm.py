@@ -10,6 +10,9 @@ import random
 from sklearn.datasets import load_digits
 from scipy import ndimage
 
+
+
+
 def generate_unit_circle_points(n_points, n_dimension, distribution=None, 
                                 noise=False, noise_mean=0, noise_var=1):
 
@@ -222,31 +225,31 @@ def lle(X, dimension, method='k_nearest_neighbors', K_neighbors = 10, epsilon = 
 
     print('Done.\n')
 
-    return Y
+    return np.transpose(Y)
 
 
 np.random.seed(1)
 
-points = generate_unit_circle_points(1000,3)
+points = generate_unit_circle_points(4000,2)
 
 # points = generate_unit_circle_points(1000,2)
 #points = generate_unit_sphere_points(1000,3, distribution="beta")
 #points = generate_rotating_img_points(13, 750, 3)
 # Y = lle(points, dimension=3, method='k_nearest_neighbors', epsilon=.02, K_neighbors=2)
-Y = lle(points, dimension=3, method='epsilon_neighborhood', epsilon=.005, K_neighbors=16)
+Y = lle(points, dimension=2, method='epsilon_neighborhood', epsilon=.002, K_neighbors=16)
 # fig,ax = plt.subplots()
 # ax.scatter(points[0,:], points[1,:])
 # plt.show()
-# # fig,ax = plt.subplots()
-# # ax.scatter(points[0,:], points[1,:])
-# # plt.show()
+fig,ax = plt.subplots()
+ax.scatter(points[0,:], points[1,:])
+plt.show()
 # YOU ALREADY CUT OUT FIRST EIGENVECTOR
 fig,ax = plt.subplots()
-ax.scatter(Y[:,0], Y[:,1])
+ax.scatter(Y[0,:], Y[1,:])
 plt.show()
 
 
-# for i in [1/100 for i in range(2,10)]:
+# for i in [1/1000 for i in range(5,10)]:
 #     Y = lle(points, dimension=2, method='epsilon_neighborhood', epsilon=i, K_neighbors=11)
 #     fig,ax = plt.subplots()
 
