@@ -67,7 +67,6 @@ for i in range(len(epsilon_list)):
         print("Select Points Type")
         break    
 
-
     if main_method == 'diffusion_map':
         print("Generating Diffusion Matrix...")
         A, D_left = generate_diffusion_matrix(points, epsilon_list[i])
@@ -83,7 +82,6 @@ for i in range(len(epsilon_list)):
 
     print("Creating " + visualization_type + " Visualization...")
     
- 
 
     if visualization_type == "2d":
         generate_2d_plot(results, idx=idx)
