@@ -22,6 +22,7 @@ def generate_3d_plot(x,idx=[0,1,2]):
 
 def generate_2d_plot(x, idx=[0,1]):
     fig,ax = plt.subplots()
+
     ax.scatter(x[:,idx[0]], x[:,idx[1]])
     plt.show()
 

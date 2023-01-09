@@ -1,36 +1,34 @@
 import numpy as np
-from lle_algorithm import lle
+from lle_algorithm import lle_epsilon_neighbors, lle_nearest_neighbors
 from diffusion_map_algorithm import generate_diffusion_map, generate_diffusion_matrix
 from visualization_algorithms import generate_2d_plot, generate_2d_plot_comparison, generate_3d_plot, generate_3d_plot_comparison, generate_digits_plot
-from data_generation_algorithms import generate_unit_circle_points, generate_rotating_img_points, generate_unit_sphere_points
+from data_generation_algorithms import generate_unit_circle_points, generate_rotating_img_points, generate_unit_sphere_points, generate_3d_figure_eight, generate_3d_loop
 
 #Setting Random Seed
 np.random.seed(1)
 
 
 # Main Parameters
-n_points=1000
-n_dimension=3
+n_points = 1000
+n_dimension=2
 #epsilon_list = [i/10 for i in range(1,11)]
-epsilon_list = [0.6,0.7]
-
+epsilon_list = [.2]
 # Method Type
-# Options are 'diffusion_map' or 'lle'
-main_method = 'lle'
+# Options are 'diffusion_map' or 'lle_epsilon_neighbors', 'lle_nearest_neighbors
+main_method = 'lle_epsilon_neighbors'
 
 
 # LLE options
 intrinsic_dimension = 2
-# Options are 'k_nearest_neighbors' or 'epsilon_neighborhood'
-lle_type = 'epsilon_neighborhood'
-if lle_type == 'k_nearest_neighbors' and main_method == 'lle':
-    epsilon_list == [0]
+if main_method == 'lle_nearest_neighbors':
+    epsilon_list = [0]
 # Number of nearest neighbors to find.
 K = 20
+dimension=2
 
 # Points Parameters
-# Options are "unit_circle", "unit_sphere", or "rotating_int"
-points_type = "unit_circle"
+# Options are "unit_circle", "unit_sphere", or "rotating_int", "loop", "figure_eight"
+points_type = "figure_eight"
 # Options are "uniform" or "beta" Distribution
 distribution="uniform"
 
@@ -46,7 +44,11 @@ padding = 3
 
 # Visualization Parameters
 visualization_type = "2d"
-idx = [0,1,2]
+if visualization_type == "2d" or visualization_type == "2d_comparison":
+    dimension=2
+elif visualization_type == "3d" or visualization_type == "3d_comparison":
+    dimension=3
+idx = [0,1]
 
 
 for i in range(len(epsilon_list)):
@@ -63,9 +65,17 @@ for i in range(len(epsilon_list)):
     elif points_type == "rotating_int":
         points = generate_rotating_img_points(img_number, n_images, padding, noise=noise,                
                                                noise_mean=noise_mean,noise_var=noise_var)
+    elif points_type == "loop":
+        points = generate_3d_loop(n_points,distribution=distribution, 
+                                  noise=noise, noise_mean=noise_mean, noise_var=noise_var)
+    elif points_type == "figure_eight":
+        points = generate_3d_figure_eight(n_points,distribution=distribution,
+                                          noise=noise, noise_mean=noise_mean, noise_var=noise_var)
     else:
-        print("Select Points Type")
-        break    
+        print("Points Type [" + points_type + "] Not Found")
+        break  
+
+    # Each column in points is a data point.
 
     if main_method == 'diffusion_map':
         print("Generating Diffusion Matrix...")
@@ -74,13 +84,18 @@ for i in range(len(epsilon_list)):
         print("Generating Diffusion Map...")
         results = generate_diffusion_map(A, D_left)
 
-    elif main_method == 'lle':
-        results = lle(points, dimension=2, method=lle_type, K_neighbors=K, epsilon=epsilon_list[i])
+    elif main_method == 'lle_nearest_neighbors':
+        results = lle_nearest_neighbors(points, dimension=dimension, K_neighbors=K)
+    elif main_method == 'lle_epsilon_neighbors':
+        results = lle_epsilon_neighbors(points, dimension=dimension, epsilon=epsilon_list[i])
 
     else:
-        print("Method not found.")
+        print("Method [" + main_method +"] Not Found")
+        break
 
     print("Creating " + visualization_type + " Visualization...")
+
+    print(results)
     
 
     if visualization_type == "2d":
@@ -94,5 +109,5 @@ for i in range(len(epsilon_list)):
     elif visualization_type == "rotating_int":
         generate_digits_plot(results, points, idx=idx)
     else:
-        print("Select Visualization Type")
+        print("Visualization Type [" + visualization_type + "] Not Found")
         break

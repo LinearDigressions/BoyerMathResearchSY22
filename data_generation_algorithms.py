@@ -3,6 +3,58 @@ from sklearn.datasets import load_digits
 from scipy import ndimage
 
 
+def generate_3d_loop(n_points,distribution=None, noise=False, noise_mean=0, noise_var=1):
+
+    # Initalizing Data Matrix
+    x = np.zeros((3,n_points))
+
+    # Specify Distribution to Draw Data Points
+    if distribution=="uniform":
+        for i in range(n_points):
+            theta = np.random.uniform(0, 2 * np.pi)
+            x[:,i] = np.array([np.sin(theta), np.cos(2 * theta), np.cos(theta)])
+      
+    elif distribution=="beta":
+        for i in range(n_points):
+            theta = (np.random.beta(5,2) * (2 * np.pi + 0.2) / 0.4) - 0.2
+            x[:,i] = np.array([np.sin(theta), np.cos(2 * theta), np.cos(theta)])
+   
+    else:
+        for i in range(n_points):
+            theta = i * 2 * np.pi / n_points
+            x[:,i] = np.array([np.sin(theta), np.cos(2 * theta), np.cos(theta)])
+          
+    # Adding Noise
+    if noise:
+        x += np.random.normal(noise_mean, noise_var, size=(3,n_points))
+
+    return x
+
+def generate_3d_figure_eight(n_points,distribution=None, noise=False, noise_mean=0, noise_var=1):
+
+    # Initalizing Data Matrix
+    x = np.zeros((3,n_points))
+
+    # Specify Distribution to Draw Data Points
+    if distribution=="uniform":
+        for i in range(n_points):
+            theta = np.random.uniform(0, 2 * np.pi)
+            x[:,i] = np.array([np.sin(2 * theta), np.cos(theta), np.cos(theta) + np.cos((theta/2) - np.pi / 4) ** 2])
+      
+    elif distribution=="beta":
+        for i in range(n_points):
+            theta = (np.random.beta(5,2) * (2 * np.pi + 0.2) / 0.4) - 0.2
+            x[:,i] = np.array([np.sin(2 * theta), np.cos(theta), np.cos(theta) + np.cos((theta/2) - np.pi / 4) ** 2])   
+    else:
+        for i in range(n_points):
+            theta = i * 2 * np.pi / n_points
+            x[:,i] = np.array([np.sin(2 * theta), np.cos(theta), np.cos(theta) + np.cos((theta/2) - np.pi / 4) ** 2])          
+    # Adding Noise
+    if noise:
+        x += np.random.normal(noise_mean, noise_var, size=(3,n_points))
+
+    return x
+
 def generate_unit_circle_points(n_points, n_dimension, distribution=None, 
                                 noise=False, noise_mean=0, noise_var=1):
 
@@ -37,7 +89,7 @@ def generate_unit_circle_points(n_points, n_dimension, distribution=None,
     if noise:
         x += np.random.normal(noise_mean, noise_var, size=(n_dimension,n_points))
 
-    return np.transpose(x)
+    return x
 
 
 def generate_unit_sphere_points(n_points, n_dimension, distribution="uniform", 
@@ -64,7 +116,7 @@ def generate_unit_sphere_points(n_points, n_dimension, distribution="uniform",
     if noise:
         x += np.random.normal(noise_mean, noise_var, size=(n_dimension,n_points))
 
-    return np.transpose(x)
+    return x
 
 
 def generate_rotating_img_points(img_number, n_images, padding, 

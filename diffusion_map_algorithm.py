@@ -6,6 +6,7 @@ def kernel(x, y, epsilon):
 
 
 def generate_diffusion_matrix(x, epsilon):
+    x = np.transpose(x)
 
     # Find number of data points
     n = x.shape[0]
