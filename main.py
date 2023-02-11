@@ -15,7 +15,7 @@ n_dimension=2
 epsilon_list = [.2]
 # Method Type
 # Options are 'diffusion_map' or 'lle_epsilon_neighbors', 'lle_nearest_neighbors
-main_method = 'lle_epsilon_neighbors'
+main_method = 'diffusion_map'
 
 
 # LLE options
@@ -30,10 +30,10 @@ dimension=2
 # Options are "unit_circle", "unit_sphere", or "rotating_int", "loop", "figure_eight"
 points_type = "figure_eight"
 # Options are "uniform" or "beta" Distribution
-distribution="uniform"
+distribution="beta"
 
 # Noise Parameters
-noise=True
+noise=False
 noise_mean=0
 noise_var=0.1
 
@@ -100,6 +100,7 @@ for i in range(len(epsilon_list)):
 
     if visualization_type == "2d":
         generate_2d_plot(results, idx=idx)
+        generate_3d_plot(np.transpose(points), idx=idx)
     elif visualization_type == "2d_comparison":
         generate_2d_plot_comparison(results, points, idx=idx)
     elif visualization_type == "3d":
