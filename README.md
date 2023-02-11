@@ -1,6 +1,6 @@
 # Dimension Reduction Research 2022-2023
 
-This repository includes projects completed under the supervision of Dr. Nan Wu from the University of Texas at Dallas
+This repository includes several projects completed under the supervision of Dr. Nan Wu from the University of Texas at Dallas
 
 Algorithms Implemented:
 * Diffusion Map Algorithm
