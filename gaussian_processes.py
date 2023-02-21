@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import cholesky, cho_solve, solve_triangular
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -48,8 +49,7 @@ class GaussianProcessesRegression():
         self.alpha = None
         self.K = None
        
-    
- 
+
     def generate_covariance_matrix(self, x, y, covariance_function):
         
         n1 = x.size
@@ -68,13 +68,20 @@ class GaussianProcessesRegression():
         self.y_train = y_train
         self.n = x_train.shape[0]
 
-        self.K = self.generate_covariance_matrix(x_train,x_train, self.kernel.covariance_function)
+        self.K = self.generate_covariance_matrix(x_train, x_train, self.kernel.covariance_function)
 
+        
         if noise_level != None:
             self.K = self.K + noise_level * np.eye(self.n)
 
-        self.L = np.linalg.cholesky(self.K)
-        self.alpha = np.linalg.solve(np.transpose(self.L), np.linalg.solve(self.L, y_train))
+        # print("Positive Eigenvalues?")
+        # print(np.linalg.eig(self.K))
+        # print("Is symmetric?")
+        # print(np.all(np.abs(self.K-self.K.T) < 1e-8))
+        self.L = cholesky(self.K, lower=True)
+        self.alpha = cho_solve((self.L, True), y_train, check_finite=False)
+
+        print(self.alpha)
 
         self.K_inverse = np.linalg.inv(self.K)
         self.gradient_pre = np.outer(self.alpha,self.alpha) - self.K_inverse
@@ -89,13 +96,12 @@ class GaussianProcessesRegression():
         for i in range (x_test.shape[0]):
             x_test_i = np.array([x_test[i]])
             k  = self.generate_covariance_matrix(self.x_train, x_test_i, self.kernel.covariance_function).flatten()
-
-            predictions[i,0]
+            
             
             predictions[i,0] = k.dot(self.alpha)
+            print(k.dot(self.alpha))
 
             v = np.linalg.solve(self.L, k)
-            
 
             predictions[i,1] = self.kernel.covariance_function(x_test_i, x_test_i) - v.dot(v)
 
@@ -181,38 +187,53 @@ class GaussianProcessesRegression():
 
 
 
+np.random.seed(1)
+n_test = 15
+n_train = 40
 
-n = 8
+x_test = np.linspace(start=0, stop=4 * np.pi, num=n_test)
+# x_train = np.array([0.25, 0.5, 0.75])
+x_train = np.linspace(0, 4 * np.pi, n_train)
+x_train = np.sort(x_train)
 
-x_test = np.linspace(start=0, stop=1, num=n)
-x_train = np.array([0.25, 0.5, 0.75])
+# y_train = (x_train)**2
+y_train = np.sin(x_train) + np.random.normal(loc=0, scale=0.2, size=n_train)
+plt.plot(x_train, y_train, label="Expected Signal")
 
-y_train = (x_train)**2
-
+plt.show()
 rbf_kernel = RBF()
 gp_model = GaussianProcessesRegression(rbf_kernel)
 
 
 gp_model.fit(x_train, y_train)
 
-# gp_model.plot_mle()
-print(rbf_kernel.signal_variance)
-print(rbf_kernel.length_scale)
-gp_model.optimize()
-print(rbf_kernel.signal_variance)
-print(rbf_kernel.length_scale)
+rbf_kernel.length_scale = 0.1
+predictions = gp_model.predict(x_test)
 
+
+
+# gp_model.optimize()
+
+# # gp_model.plot_mle()
+# print(rbf_kernel.signal_variance)
+# print(rbf_kernel.length_scale)
+# gp_model.optimize()
+# print(rbf_kernel.signal_variance)
+# print(rbf_kernel.length_scale)
+plt.plot(x_train, y_train, label="Expected Signal")
+plt.scatter(x_test,predictions[:,0], color="black", alpha=0.4, label="Observations")
+plt.legend()
+plt.show()
 
 # print(gp_model.gradient())
 
 
 # log_marginal_likelihood= gp_model.fit(x_train, y_train)
 # print("LML: " + str(log_marginal_likelihood))
-# predictions = gp_model.predict(x_test)
 # print(predictions)
 # print(predictions[:,0])
 
-
+# plt.scatter(x_train, y_train)
 # plt.scatter(x_test, predictions[:,0])
 # plt.show()
 

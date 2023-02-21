@@ -1,8 +1,8 @@
 import numpy as np
-from lle_algorithm import lle_epsilon_neighbors, lle_nearest_neighbors
+from lle_algorithm import lle_epsilon_neighbors, lle_nearest_neighbors, LocallyLinearEmbedding
 from diffusion_map_algorithm import generate_diffusion_map, generate_diffusion_matrix
 from visualization_algorithms import generate_2d_plot, generate_2d_plot_comparison, generate_3d_plot, generate_3d_plot_comparison, generate_digits_plot
-from data_generation_algorithms import generate_unit_circle_points, generate_rotating_img_points, generate_unit_sphere_points, generate_3d_figure_eight, generate_3d_loop
+from data_generation_algorithms import generate_unit_circle_points, generate_rotating_img_points, generate_unit_sphere_points, generate_3d_figure_eight, generate_3d_loop, generate_3d_intersecting_figure_eight
 
 #Setting Random Seed
 np.random.seed(1)
@@ -11,8 +11,8 @@ np.random.seed(1)
 # Main Parameters
 n_points = 1000
 n_dimension=2
-#epsilon_list = [i/10 for i in range(1,11)]
-epsilon_list = [.2]
+epsilon_list = [i/10 for i in range(1,11)]
+#epsilon_list = [.2]
 # Method Type
 # Options are 'diffusion_map' or 'lle_epsilon_neighbors', 'lle_nearest_neighbors
 main_method = 'diffusion_map'
@@ -27,10 +27,10 @@ K = 20
 dimension=2
 
 # Points Parameters
-# Options are "unit_circle", "unit_sphere", or "rotating_int", "loop", "figure_eight"
-points_type = "figure_eight"
+# Options are "unit_circle", "unit_sphere", or "rotating_int", "loop", "figure_eight", "intersecting_figure_eight"
+points_type = "intersecting_figure_eight"
 # Options are "uniform" or "beta" Distribution
-distribution="beta"
+distribution="uniform"
 
 # Noise Parameters
 noise=False
@@ -71,6 +71,9 @@ for i in range(len(epsilon_list)):
     elif points_type == "figure_eight":
         points = generate_3d_figure_eight(n_points,distribution=distribution,
                                           noise=noise, noise_mean=noise_mean, noise_var=noise_var)
+    elif points_type == "intersecting_figure_eight":
+        points = generate_3d_intersecting_figure_eight(n_points,distribution=distribution,
+                                          noise=noise, noise_mean=noise_mean, noise_var=noise_var)
     else:
         print("Points Type [" + points_type + "] Not Found")
         break  
@@ -100,7 +103,6 @@ for i in range(len(epsilon_list)):
 
     if visualization_type == "2d":
         generate_2d_plot(results, idx=idx)
-        generate_3d_plot(np.transpose(points), idx=idx)
     elif visualization_type == "2d_comparison":
         generate_2d_plot_comparison(results, points, idx=idx)
     elif visualization_type == "3d":
